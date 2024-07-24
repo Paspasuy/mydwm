@@ -1744,7 +1744,7 @@ setup(void)
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
 	lrpad = drw->fonts->h;
-	bh = drw->fonts->h + 2;
+	bh = drw->fonts->h;// + 2;
 	updategeom();
 	/* init atoms */
 	utf8string = XInternAtom(dpy, "UTF8_STRING", False);
@@ -1877,8 +1877,9 @@ tagmon(const Arg *arg)
 
 void
 tile(Monitor *m)
-{
-	unsigned int i, n, h, mw, my, ty;
+{ 
+	unsigned int i, n, h, mw, my, ty, offset_y;
+  my = ty = offsetpx / 2;
 	Client *c;
 
 	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
@@ -1889,17 +1890,17 @@ tile(Monitor *m)
 		mw = m->nmaster ? m->ww * m->mfact : 0;
 	else
 		mw = m->ww;
-	for (i = my = ty = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+	for (i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
 		if (i < m->nmaster) {
-			h = (m->wh - my) / (MIN(n, m->nmaster) - i);
-			resize(c, m->wx, m->wy + my, mw - (2*c->bw), h - (2*c->bw), 0);
+			h = (m->wh - offsetpx / 2 - my) / (MIN(n, m->nmaster) - i);
+			resize(c, m->wx + offsetpx, m->wy + my + offsetpx / 2, mw - (2*c->bw) - offsetpx * 3 / 2, h - (2*c->bw) - offsetpx, 0);
 			if (my + HEIGHT(c) < m->wh)
-				my += HEIGHT(c);
+				my += HEIGHT(c) + offsetpx;
 		} else {
-			h = (m->wh - ty) / (n - i);
-			resize(c, m->wx + mw, m->wy + ty, m->ww - mw - (2*c->bw), h - (2*c->bw), 0);
+			h = (m->wh - offsetpx / 2 - ty) / (n - i);
+			resize(c, m->wx + mw + offsetpx / 2, m->wy + ty + offsetpx / 2, m->ww - mw - (2*c->bw) - offsetpx * 3 / 2, h - (2*c->bw) - offsetpx, 0);
 			if (ty + HEIGHT(c) < m->wh)
-				ty += HEIGHT(c);
+				ty += HEIGHT(c) + offsetpx;
 		}
 }
 
