@@ -1098,7 +1098,7 @@ grabkeys(void)
 void
 incnmaster(const Arg *arg)
 {
-	selmon->nmaster = MAX(selmon->nmaster + arg->i, 0);
+	selmon->nmaster = MIN(MAX(selmon->nmaster + arg->i, 0), 10);
 	arrange(selmon);
 }
 
@@ -1878,13 +1878,19 @@ tagmon(const Arg *arg)
 void
 tile(Monitor *m)
 { 
-	unsigned int i, n, h, mw, my, ty, offset_y;
-  my = ty = offsetpx / 2;
+	unsigned int i, n, h, mw, my, ty;
+	my = ty = offsetpx / 2;
 	Client *c;
+	unsigned int lo = offsetpx;
+	unsigned int oxb = offsetpx; // offset x border
+	unsigned int oxc = offsetpx / 2; // offset x center
 
 	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
 	if (n == 0)
 		return;
+
+	if ((m->nmaster == 0) || (n <= m->nmaster))
+		oxc = offsetpx;
 
 	if (n > m->nmaster)
 		mw = m->nmaster ? m->ww * m->mfact : 0;
@@ -1892,15 +1898,15 @@ tile(Monitor *m)
 		mw = m->ww;
 	for (i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
 		if (i < m->nmaster) {
-			h = (m->wh - offsetpx / 2 - my) / (MIN(n, m->nmaster) - i);
-			resize(c, m->wx + offsetpx, m->wy + my + offsetpx / 2, mw - (2*c->bw) - offsetpx * 3 / 2, h - (2*c->bw) - offsetpx, 0);
+			h = (m->wh - lo / 2 - my) / (MIN(n, m->nmaster) - i);
+			resize(c, m->wx + oxb, m->wy + my + lo / 2, mw - (2*c->bw) - oxb - oxc, h - (2*c->bw) - lo, 0);
 			if (my + HEIGHT(c) < m->wh)
-				my += HEIGHT(c) + offsetpx;
+				my += HEIGHT(c) + lo;
 		} else {
-			h = (m->wh - offsetpx / 2 - ty) / (n - i);
-			resize(c, m->wx + mw + offsetpx / 2, m->wy + ty + offsetpx / 2, m->ww - mw - (2*c->bw) - offsetpx * 3 / 2, h - (2*c->bw) - offsetpx, 0);
+			h = (m->wh - lo / 2 - ty) / (n - i);
+			resize(c, m->wx + mw + oxc, m->wy + ty + lo / 2, m->ww - mw - (2*c->bw) - oxb - oxc, h - (2*c->bw) - lo, 0);
 			if (ty + HEIGHT(c) < m->wh)
-				ty += HEIGHT(c) + offsetpx;
+				ty += HEIGHT(c) + lo;
 		}
 }
 
