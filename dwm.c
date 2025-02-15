@@ -237,6 +237,7 @@ static void tagmon(const Arg *arg);
 static void tile(Monitor *m);
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
+static void toggleoffset(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void unfocus(Client *c, int setfocus);
@@ -302,6 +303,8 @@ static Window root, wmcheckwin;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
+
+static int runtime_offset = offsetpx;
 
 /* compile-time check if all tags fit into an unsigned int bit array. */
 struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
@@ -1879,18 +1882,18 @@ void
 tile(Monitor *m)
 { 
 	unsigned int i, n, h, mw, my, ty;
-	my = ty = offsetpx / 2;
+	my = ty = runtime_offset / 2;
 	Client *c;
-	unsigned int lo = offsetpx;
-	unsigned int oxb = offsetpx; // offset x border
-	unsigned int oxc = offsetpx / 2; // offset x center
+	unsigned int lo = runtime_offset;
+	unsigned int oxb = runtime_offset; // offset x border
+	unsigned int oxc = runtime_offset / 2; // offset x center
 
 	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
 	if (n == 0)
 		return;
 
 	if ((m->nmaster == 0) || (n <= m->nmaster))
-		oxc = offsetpx;
+		oxc = runtime_offset;
 
 	if (n > m->nmaster)
 		mw = m->nmaster ? m->ww * m->mfact : 0;
@@ -1942,6 +1945,13 @@ togglefloating(const Arg *arg)
 		resize(selmon->sel, selmon->sel->x, selmon->sel->y,
 			selmon->sel->w, selmon->sel->h, 0);
 	arrange(selmon);
+}
+
+void
+toggleoffset(const Arg *arg)
+{
+  runtime_offset = runtime_offset == 0 ? offsetpx : 0;
+  arrange(selmon);
 }
 
 void

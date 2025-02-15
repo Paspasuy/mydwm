@@ -73,7 +73,7 @@ static const Layout layouts[] = {
 
 /* key definitions */
 // For Win: #define MODKEY Mod4Mask
-#define MODKEY Mod1Mask
+#define MODKEY Mod4Mask
 #define TAGKEYS(KEY,TAG) \
 	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
 	{ MODKEY|ShiftMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
@@ -86,7 +86,7 @@ static const Layout layouts[] = {
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
-static const char *termcmd[]  = { "kitty", NULL };
+static const char *termcmd[]  = { "alacritty", NULL };
 static const char *scrot[]  = { "flameshot", "gui", NULL };
 static const char *scrot2[]  = { "flameshot", "full", NULL };
 static const char *amixerp[]  = { "amixer", "sset", "-q", "Master", "5%+", NULL };
@@ -100,6 +100,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_o, spawn,          {.v = scrot } },
+	{ MODKEY|ShiftMask,             XK_o,      toggleoffset,   {0} },
 
 	{ 0,               XK_Print, spawn,          {.v = scrot } },
 	{ ShiftMask,               XK_Print, spawn,          {.v = scrot2 } },
